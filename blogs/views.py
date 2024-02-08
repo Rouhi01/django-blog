@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from.models import Blog, Category
+from django.db.models import Q
 
 class PostsByCategoryView(View):
     template_name = 'blogs/posts_by_category.html'
@@ -27,3 +28,14 @@ class BlogView(View):
         return render(request, self.template_name, context)
     def post(self, request, slug):
         pass
+
+class SearchView(View):
+    template_name = 'blogs/search.html'
+    def get(self, request):
+        kw = request.GET.get('keyword')
+        posts = Blog.objects.filter(Q(title__icontains=kw) | Q(short_description__icontains=kw) | Q(blog_body__icontains=kw), status='Published')
+        context = {
+            'posts':posts,
+            'kw':kw
+        }
+        return render(request, self.template_name, context)
