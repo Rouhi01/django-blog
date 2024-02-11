@@ -5,8 +5,12 @@ from assignments.models import About
 from .forms import RegisterForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
 class HomeView(View):
     template_name = 'home.html'
+
     def get(self, request):
         categories = Category.objects.all()
         try:
@@ -22,15 +26,24 @@ class HomeView(View):
         }
         return render(request, self.template_name, context)
 
+
 class RegisterView(View):
     template_name = 'register.html'
     form_clas = RegisterForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home')
+        else:
+            return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         form = RegisterForm()
         context = {
             'form':form
         }
         return render(request, self.template_name, context)
+
     def post(self, request):
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -42,8 +55,15 @@ class RegisterView(View):
             }
             return render(request, self.template_name, context)
 
+
 class LoginView(View):
     template_name = 'login.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('home')
+        else:
+            return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
         form = AuthenticationForm()
@@ -67,7 +87,10 @@ class LoginView(View):
             }
             return render(request, self.template_name, context)
 
-class LogoutView(View):
+
+class LogoutView(LoginRequiredMixin, View):
     def get(self, request):
         logout(request)
         return redirect('home')
+
+

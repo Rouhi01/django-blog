@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
 
     'blogs.apps.BlogsConfig',
-    'assignments.apps.AssignmentsConfig'
+    'assignments.apps.AssignmentsConfig',
+    'dashboards.apps.DashboardsConfig'
 ]
 
 MIDDLEWARE = [
