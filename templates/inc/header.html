@@ -15,8 +15,10 @@
         </div>
         <div class="col-4 d-flex justify-content-end align-items-center">
             {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
                 <span><a href="{% url 'dashboards:dashboard' %}" class="btn btn-sm btn-outline-warning">Dashboard</a></span>
                 &nbsp;
+                {% endif %}
                 <a class="btn btn-sm btn-warning" href="{% url 'logout' %}">Logout</a> &nbsp;
             {% else %}
                 <a class="btn btn-sm btn-warning" href="{% url 'login' %}">Login</a> &nbsp;

@@ -3,15 +3,17 @@
 {% block content %}
     <div class="row">
         {% include 'dashboards/inc/sidebar.html' %}
-
-        <div class="col-md-9">
-            <h2>Add Post</h2>
-            <form action="{% url 'dashboards:add_post' %}" method="post" enctype="multipart/form-data" >
-                {% csrf_token %}
-                {{ form | crispy }}
-                <button type="submit" class="btn btn-warning mb-1">Submit</button>
-            </form>
-        </div>
-
+        {% if perms.blogs.add_blog %}
+            <div class="col-md-9">
+                <h2>Add Post</h2>
+                <form action="{% url 'dashboards:add_post' %}" method="post" enctype="multipart/form-data" >
+                    {% csrf_token %}
+                    {{ form | crispy }}
+                    <button type="submit" class="btn btn-warning mb-1">Submit</button>
+                </form>
+            </div>
+        {% else %}
+            <h5>You do not have permission to view this page</h5>
+        {% endif %}
     </div>
 {% endblock %}

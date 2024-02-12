@@ -18,4 +18,11 @@ urlpatterns = [
     path('posts/edit/<int:post_id>/', views.EditPostView.as_view(), name='edit_post'),
     path('posts/delete/<int:post_id>/', views.DeletePostView.as_view(), name='delete_post'),
 
+    #User
+    path('users/', views.UsersView.as_view(), name='users'),
+    path('users/add/', views.AddUserView.as_view(), name='add_user'),
+    path('users/edit/<int:user_id>/', views.EditUserView.as_view(), name='edit_user'),
+    path('users/delete/<int:user_id>/', views.DeleteUserView.as_view(), name='delete_user'),
+
+
 ]

@@ -4,38 +4,42 @@
         {% include 'dashboards/inc/sidebar.html' %}
 
         <div class="col-md-9">
-            <h2>All Posts</h2>
-            <a href="{% url 'dashboards:add_post' %}" class="btn btn-dark text-light mb-1 float-right">Add New</a>
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Author</th>
-                  <th>Status</th>
-                  <th>Featured</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for post in posts %}
+            {% if perms.blogs.view_blog %}
+                <h2>All Posts</h2>
+                <a href="{% url 'dashboards:add_post' %}" class="btn btn-dark text-light mb-1 float-right">Add New</a>
+                <table class="table table-hover">
+                  <thead>
                     <tr>
-                      <th>{{ forloop.counter }}</th>
-                      <td>{{ post.title }}</td>
-                      <td>{{ post.category }}</td>
-                      <td>{{ post.author }}</td>
-                      <td>{{ post.status }}</td>
-                      <td>{% if post.is_featured %}<i class="fa fa-check fa-lg text-success"></i>{% else %}<i class="fa fa-times fa-lg text-danger"></i>{% endif %} </td>
-                      <td>
-                          <a href="{% url 'dashboards:edit_post' post.id %}"><i class="fa fa-edit fa-lg text-success"></i></a>
-                          &nbsp;
-                          <a href="{% url 'dashboards:delete_post' post.id %}"><i class="fa fa-trash fa-lg text-danger"></i></a>
-                      </td>
+                      <th>#</th>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th>Author</th>
+                      <th>Status</th>
+                      <th>Featured</th>
+                      <th>Action</th>
                     </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {% for post in posts %}
+                        <tr>
+                          <th>{{ forloop.counter }}</th>
+                          <td>{{ post.title }}</td>
+                          <td>{{ post.category }}</td>
+                          <td>{{ post.author }}</td>
+                          <td>{{ post.status }}</td>
+                          <td>{% if post.is_featured %}<i class="fa fa-check fa-lg text-success"></i>{% else %}<i class="fa fa-times fa-lg text-danger"></i>{% endif %} </td>
+                          <td>
+                              <a href="{% url 'dashboards:edit_post' post.id %}"><i class="fa fa-edit fa-lg text-success"></i></a>
+                              &nbsp;
+                              <a href="{% url 'dashboards:delete_post' post.id %}"><i class="fa fa-trash fa-lg text-danger"></i></a>
+                          </td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            {% else %}
+                <h5>You do not have permission to view this page</h5>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

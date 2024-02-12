@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from blogs.models import Blog, Category
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import AddCategoryForm, EditCategoryForm, AddPostForm, EditPostForm
+from .forms import AddCategoryForm, EditCategoryForm, AddPostForm, EditPostForm, AddUserForm, EditUserForm
 from django.utils.text import slugify
+from django.contrib.auth.models import User
 
 
 class DashboardView(LoginRequiredMixin, View):
@@ -55,7 +56,7 @@ class EditCategoryView(LoginRequiredMixin, View):
     form_class = EditCategoryForm
 
     def setup(self, request, *args, **kwargs):
-        self.category_instance = Category.objects.get(id=kwargs['category_id'])
+        self.category_instance = get_object_or_404(Category, id=kwargs['category_id'])
         super().setup(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -79,7 +80,7 @@ class EditCategoryView(LoginRequiredMixin, View):
 
 class DeleteCategoryView(LoginRequiredMixin, View):
     def setup(self, request, *args, **kwargs):
-        self.category_instance = Category.objects.get(id=kwargs['category_id'])
+        self.category_instance = get_object_or_404(Category, id=kwargs['category_id'])
         super().setup(request, *args, **kwargs)
     def get(self, request, *args, **kwargs):
         self.category_instance.delete()
@@ -127,7 +128,7 @@ class EditPostView(LoginRequiredMixin, View):
     form_class = EditPostForm
 
     def setup(self, request, *args, **kwargs):
-        self.post_instance = Blog.objects.get(id=kwargs['post_id'])
+        self.post_instance = get_object_or_404(Blog, id=kwargs['post_id'])
         super().setup(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -154,9 +155,81 @@ class EditPostView(LoginRequiredMixin, View):
 
 class DeletePostView(LoginRequiredMixin, View):
     def setup(self, request, *args, **kwargs):
-        self.post_instance = Blog.objects.get(id=kwargs['post_id'])
+        self.post_instance = get_object_or_404(Blog, id=kwargs['post_id'])
         super().setup(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         self.post_instance.delete()
         return redirect('dashboards:posts')
+
+
+class UsersView(LoginRequiredMixin, View):
+    template_name = 'dashboards/users.html'
+    def setup(self, request, *args, **kwargs):
+        self.users = User.objects.all()
+        super().setup(request, *args, **kwargs)
+    def get(self,request, *args, **kwargs):
+        users = self.users
+        context = {
+            'users':users
+        }
+        return render(request, self.template_name, context)
+
+
+class AddUserView(LoginRequiredMixin, View):
+    template_name = 'dashboards/add_user.html'
+    form_class = AddUserForm
+
+    def get(self, request):
+        form = self.form_class()
+        context = {
+            'form':form
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboards:users')
+        else:
+            context = {
+                'form': form
+            }
+            return render(request, self.template_name, context)
+
+
+class EditUserView(LoginRequiredMixin, View):
+    template_name = 'dashboards/edit_user.html'
+    form_class = EditUserForm
+
+    def setup(self, request, *args, **kwargs):
+        self.user_instance = get_object_or_404(User, id=kwargs['user_id'])
+        super().setup(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class(instance=self.user_instance)
+        context = {
+            'form':form
+        }
+        return render(request, self.template_name, context)
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, instance=self.user_instance)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboards:users')
+        else:
+            context = {
+                'form':form
+            }
+            return render(request, self.template_name, context)
+
+
+class DeleteUserView(LoginRequiredMixin, View):
+    def setup(self, request, *args, **kwargs):
+        self.user_instance = get_object_or_404(User, id=kwargs['user_id'])
+        super().setup(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.user_instance.delete()
+        return redirect('dashboards:users')
