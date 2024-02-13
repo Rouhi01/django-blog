@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from.models import Blog, Category
+from.models import Blog, Category, Comment
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 
 class PostsByCategoryView(View):
     template_name = 'blogs/posts_by_category.html'
@@ -20,14 +21,29 @@ class PostsByCategoryView(View):
 
 class BlogView(View):
     template_name = 'blogs/post_detail.html'
-    def get(self, request, slug):
-        post = get_object_or_404(Blog, slug=slug, status="Published")
+    def setup(self, request, *args, **kwargs):
+        self.post_instance = get_object_or_404(Blog, slug=kwargs['slug'], status='Published')
+        super().setup(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        post = self.post_instance
+        comments = Comment.objects.filter(blog=post)
+        comment_count = comments.count()
+
         context = {
-            'post':post
+            'comment_count':comment_count,
+            'post':post,
+            'comments':comments
         }
         return render(request, self.template_name, context)
-    def post(self, request, slug):
-        pass
+    def post(self, request, *args, **kwargs):
+        post = self.post_instance
+        comment = Comment()
+        comment.user = request.user
+        comment.blog = post
+        comment.comment = request.POST['comment']
+        comment.save()
+        return HttpResponseRedirect(request.path)
+
 
 class SearchView(View):
     template_name = 'blogs/search.html'

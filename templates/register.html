@@ -6,6 +6,6 @@
     <form action="{% url 'register' %}" method="post" novalidate style="width: 500px; margin: auto;">
         {% csrf_token %}
         {{ form | crispy }}
-        <button type="submit" class="btn btn-warning">Submit</button>
+        <button type="submit" class="btn btn-warning mb-1">Submit</button>
     </form>
 {% endblock %}
